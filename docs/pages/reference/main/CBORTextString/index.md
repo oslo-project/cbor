@@ -20,7 +20,7 @@ function constructor(value: Uint8Array): this;
 
 ## Methods
 
-- [`CBORTextString.decode()`]()
+- [`CBORTextString.decode()`](/reference/main/CBORTextString/decode)
 
 ## Properties
 

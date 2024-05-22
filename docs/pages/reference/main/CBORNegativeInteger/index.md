@@ -20,7 +20,7 @@ function constructor(value: bigint): value;
 
 ## Methods
 
-- [`CBORNegativeInteger.isNumber()`]()
+- [`CBORNegativeInteger.isNumber()`](/reference/main/CBORNegativeInteger/isNumber)
 
 ## Properties
 

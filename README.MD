@@ -2,7 +2,7 @@
 
 Documentation: https://cbor.oslojs.dev
 
-A CBOR library for JavaScript based on [RFC 8949]().
+A CBOR library for JavaScript based on [RFC 8949](https://datatracker.ietf.org/doc/html/rfc8949).
 
 - Runtime agnostic
 - No third-party dependencies

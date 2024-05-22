@@ -4,7 +4,7 @@ title: "decodeCBORIntoNative()"
 
 # decodeCBORIntoNative()
 
-Decodes the CBOR-encoded data and returns the decoded value as native JS values and the number of bytes decoded. Use [`decodeCBORIntoNativeNoLeftoverBytes()`]() if you don't expect any leftover bytes. This
+Decodes the CBOR-encoded data and returns the decoded value as native JS values and the number of bytes decoded. Use [`decodeCBORIntoNativeNoLeftoverBytes()`](/reference/main/decodeCBORIntoNativeNoLeftoverBytes) if you don't expect any leftover bytes.
 
 Values are decoded as:
 
@@ -18,12 +18,12 @@ Values are decoded as:
   - Tag #0 and #1 (date): `Date`
   - Tag #2 and #3 (bigint): `BigInt`
   - Tag #55799 (self-described CBOR): The tagged value as native JS values
-- Unsupported tags: [`CBORTaggedValue`]()
+- Unsupported tags: [`CBORTaggedValue`](/reference/main/CBORTaggedValue)
 - Floats: `Number` where float 16 and 32 are represented as float64, which can cause minor shifts in accuracy
 - Supported simple values: `true`, `false`, `null`, `undefined`
-- Unsupported simple values: [`CBORSimpleValue`]()
+- Unsupported simple values: [`CBORSimpleValue`](/reference/main/CBORSimpleValue)
 
-Unlike [`decodeCBOR()`](), this also checks for the validity and will throw on:
+Unlike [`decodeCBOR()`](/reference/main/decodeCBOR), this also [validates](https://datatracker.ietf.org/doc/html/rfc8949#name-terminology) the data and will throw `CBORInvalidError` on:
 
 - Text strings with invalid UTF-8
 - Maps with duplicate stringified keys
@@ -31,9 +31,9 @@ Unlike [`decodeCBOR()`](), this also checks for the validity and will throw on:
 
 It can throw one of:
 
-- [`CBORNotWellFormedError`](): CBOR is not well formed
-- [`CBORTooDeepError`](): The CBOR data is too deep
-- [`CBORInvalidError`](): Invalid data
+- [`CBORNotWellFormedError`](/reference/main/CBORNotWellFormedError): CBOR is not well formed
+- [`CBORTooDeepError`](/reference/main/CBORTooDeepError): The CBOR data is too deep
+- [`CBORInvalidError`](/reference/main/CBORInvalidError): Invalid data
 
 ## Definition
 

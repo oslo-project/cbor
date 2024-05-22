@@ -20,7 +20,7 @@ function constructor(value: Uint8Array): this;
 
 ## Methods
 
-- [`CBORFloat16.toNumber()`]()
+- [`CBORFloat16.toNumber()`](/reference/main/CBORFloat16/toNumber)
 
 ## Properties
 

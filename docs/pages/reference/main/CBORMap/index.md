@@ -23,10 +23,10 @@ function constructor(value: [$$CBORValue, $$CBORValue][]): this;
 
 ## Methods
 
-- [`CBORMap.get()`]()
-- [`CBORMap.getAll()`]()
-- [`CBORMap.has()`]()
-- [`CBORMap.hasDuplicateKeys()`]()
+- [`CBORMap.get()`](/reference/main/CBORMap/get)
+- [`CBORMap.getAll()`](/reference/main/CBORMap/getAll)
+- [`CBORMap.has()`](/reference/main/CBORMap/has)
+- [`CBORMap.hasDuplicateKeys()`](/reference/main/CBORMap/hasDuplicateKeys)
 
 ## Properties
 
