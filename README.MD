@@ -12,7 +12,10 @@ A CBOR library for JavaScript based on [RFC 8949]().
 import { decodeCBORIntoNativeNoLeftoverBytes } from "@oslojs/cbor";
 
 const MAX_DEPTH = 10;
-const result: Result = decodeCBORIntoNativeNoLeftoverBytes(cborBytes as Uint8Array, MAX_DEPTH);
+const encoded = new Uint8Array([
+	0xa1, 0x67, 0x6d, 0x65, 0x73, 0x73, 0x61, 0x67, 0x65, 0x65, 0x68, 0x65, 0x6c, 0x6c, 0x6f
+]);
+const result: Result = decodeCBORIntoNativeNoLeftoverBytes(encoded, MAX_DEPTH);
 const message: string = result.message;
 
 interface Result {
