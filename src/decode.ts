@@ -73,18 +73,7 @@ function decodeCBORIncludingBreaks(
 		if (additionalInformation < 24) {
 			return [new CBORPositiveInteger(BigInt(additionalInformation)), 1];
 		}
-		let argumentSize: number;
-		if (additionalInformation === 24) {
-			argumentSize = 1;
-		} else if (additionalInformation === 25) {
-			argumentSize = 2;
-		} else if (additionalInformation === 26) {
-			argumentSize = 4;
-		} else if (additionalInformation === 27) {
-			argumentSize = 8;
-		} else {
-			throw new CBORNotWellFormedError();
-		}
+		const argumentSize = getArgumentSize(additionalInformation);
 		const value = getVariableUint(data, argumentSize, 1);
 		return [new CBORPositiveInteger(value), 1 + argumentSize];
 	}
@@ -95,18 +84,7 @@ function decodeCBORIncludingBreaks(
 		if (additionalInformation < 24) {
 			return [new CBORNegativeInteger(BigInt(-1 - additionalInformation)), 1];
 		}
-		let argumentSize: number;
-		if (additionalInformation === 24) {
-			argumentSize = 1;
-		} else if (additionalInformation === 25) {
-			argumentSize = 2;
-		} else if (additionalInformation === 26) {
-			argumentSize = 4;
-		} else if (additionalInformation === 27) {
-			argumentSize = 8;
-		} else {
-			throw new CBORNotWellFormedError();
-		}
+		const argumentSize = getArgumentSize(additionalInformation);
 		const value = getVariableUint(data, argumentSize, 1);
 		return [new CBORNegativeInteger(-1n - BigInt(value)), 1 + argumentSize];
 	}
@@ -115,9 +93,8 @@ function decodeCBORIncludingBreaks(
 		// Byte string
 		const additionalInformation = data[0] & 0x1f;
 
-		let offset: number;
 		if (additionalInformation === 31) {
-			offset = 1;
+			let offset = 1;
 			let size = offset;
 			const buffer = new VariableSizeBuffer(0);
 			// eslint-disable-next-line no-constant-condition
@@ -130,7 +107,6 @@ function decodeCBORIncludingBreaks(
 				const innerAdditionalInformation = data[offset] & 0x1f;
 				if (innerMajorType === 7 && innerAdditionalInformation === 31) {
 					// Break
-					offset += 1;
 					size += 1;
 					break;
 				}
@@ -144,18 +120,7 @@ function decodeCBORIncludingBreaks(
 					innerByteSize = innerAdditionalInformation;
 					innerOffset = 1;
 				} else {
-					let innerArgumentSize: number;
-					if (innerAdditionalInformation === 24) {
-						innerArgumentSize = 1;
-					} else if (innerAdditionalInformation === 25) {
-						innerArgumentSize = 2;
-					} else if (innerAdditionalInformation === 26) {
-						innerArgumentSize = 4;
-					} else if (innerAdditionalInformation === 27) {
-						innerArgumentSize = 8;
-					} else {
-						throw new CBORNotWellFormedError();
-					}
+					const innerArgumentSize = getArgumentSize(innerAdditionalInformation);
 					const value = getVariableUint(data, innerArgumentSize, offset + 1);
 					if (value > Number.MAX_SAFE_INTEGER) {
 						throw new CBORDataTooLargeError();
@@ -173,23 +138,13 @@ function decodeCBORIncludingBreaks(
 			return [new CBORByteString(buffer.bytes()), size];
 		}
 
+		let offset: number;
 		let byteSize: number;
 		if (additionalInformation < 24) {
 			byteSize = additionalInformation;
 			offset = 1;
 		} else {
-			let argumentSize: number;
-			if (additionalInformation === 24) {
-				argumentSize = 1;
-			} else if (additionalInformation === 25) {
-				argumentSize = 2;
-			} else if (additionalInformation === 26) {
-				argumentSize = 4;
-			} else if (additionalInformation === 27) {
-				argumentSize = 8;
-			} else {
-				throw new CBORNotWellFormedError();
-			}
+			const argumentSize = getArgumentSize(additionalInformation);
 			const value = getVariableUint(data, argumentSize, 1);
 			if (value > Number.MAX_SAFE_INTEGER) {
 				throw new CBORDataTooLargeError();
@@ -236,18 +191,7 @@ function decodeCBORIncludingBreaks(
 					innerByteSize = innerAdditionalInformation;
 					innerOffset = 1;
 				} else {
-					let innerArgumentSize: number;
-					if (innerAdditionalInformation === 24) {
-						innerArgumentSize = 1;
-					} else if (innerAdditionalInformation === 25) {
-						innerArgumentSize = 2;
-					} else if (innerAdditionalInformation === 26) {
-						innerArgumentSize = 4;
-					} else if (innerAdditionalInformation === 27) {
-						innerArgumentSize = 8;
-					} else {
-						throw new CBORNotWellFormedError();
-					}
+					const innerArgumentSize = getArgumentSize(innerAdditionalInformation);
 					const value = getVariableUint(data, innerArgumentSize, offset + 1);
 					if (value > Number.MAX_SAFE_INTEGER) {
 						throw new CBORDataTooLargeError();
@@ -270,18 +214,7 @@ function decodeCBORIncludingBreaks(
 			byteSize = additionalInformation;
 			offset = 1;
 		} else {
-			let argumentSize: number;
-			if (additionalInformation === 24) {
-				argumentSize = 1;
-			} else if (additionalInformation === 25) {
-				argumentSize = 2;
-			} else if (additionalInformation === 26) {
-				argumentSize = 4;
-			} else if (additionalInformation === 27) {
-				argumentSize = 8;
-			} else {
-				throw new CBORNotWellFormedError();
-			}
+			const argumentSize = getArgumentSize(additionalInformation);
 			const value = getVariableUint(data, argumentSize, 1);
 			if (value > Number.MAX_SAFE_INTEGER) {
 				throw new CBORDataTooLargeError();
@@ -324,18 +257,7 @@ function decodeCBORIncludingBreaks(
 		if (additionalInformation < 24) {
 			arraySize = additionalInformation;
 		} else {
-			let argumentSize: number;
-			if (additionalInformation === 24) {
-				argumentSize = 1;
-			} else if (additionalInformation === 25) {
-				argumentSize = 2;
-			} else if (additionalInformation === 26) {
-				argumentSize = 4;
-			} else if (additionalInformation === 27) {
-				argumentSize = 8;
-			} else {
-				throw new CBORNotWellFormedError();
-			}
+			const argumentSize = getArgumentSize(additionalInformation);
 			const value = getVariableUint(data, argumentSize, 1);
 			if (value > Number.MAX_SAFE_INTEGER) {
 				throw new CBORDataTooLargeError();
@@ -402,18 +324,7 @@ function decodeCBORIncludingBreaks(
 		if (additionalInformation < 24) {
 			pairCount = additionalInformation;
 		} else {
-			let argumentSize: number;
-			if (additionalInformation === 24) {
-				argumentSize = 1;
-			} else if (additionalInformation === 25) {
-				argumentSize = 2;
-			} else if (additionalInformation === 26) {
-				argumentSize = 4;
-			} else if (additionalInformation === 27) {
-				argumentSize = 8;
-			} else {
-				throw new CBORNotWellFormedError();
-			}
+			const argumentSize = getArgumentSize(additionalInformation);
 			const value = getVariableUint(data, argumentSize, 1);
 			if (value > Number.MAX_SAFE_INTEGER) {
 				throw new CBORDataTooLargeError();
@@ -460,18 +371,7 @@ function decodeCBORIncludingBreaks(
 			tagNumber = BigInt(additionalInformation);
 			headSize = 1;
 		} else {
-			let argumentSize: number;
-			if (additionalInformation === 24) {
-				argumentSize = 1;
-			} else if (additionalInformation === 25) {
-				argumentSize = 2;
-			} else if (additionalInformation === 26) {
-				argumentSize = 4;
-			} else if (additionalInformation === 27) {
-				argumentSize = 8;
-			} else {
-				throw new CBORNotWellFormedError();
-			}
+			const argumentSize = getArgumentSize(additionalInformation);
 			tagNumber = getVariableUint(data, argumentSize, 1);
 			headSize = 1 + argumentSize;
 		}
@@ -539,6 +439,20 @@ function decodeCBORIncludingBreaks(
 	}
 
 	throw new CBORNotWellFormedError();
+}
+
+function getArgumentSize(additionalInformation: number): number {
+	if (additionalInformation === 24) {
+		return 1;
+	} else if (additionalInformation === 25) {
+		return 2;
+	} else if (additionalInformation === 26) {
+		return 4;
+	} else if (additionalInformation === 27) {
+		return 8;
+	} else {
+		throw new CBORNotWellFormedError();
+	}
 }
 
 function getVariableUint(data: Uint8Array, size: number, offset: number): bigint {
