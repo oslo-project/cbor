@@ -1,0 +1,22 @@
+{
+	"name": "@oslojs/cbor",
+	"description": "A CBOR library for JavaScript.",
+	"domain": "https://cbor.oslojs.dev",
+	"twitter": "@pilcrowonpaper",
+	"asset_hashing": true,
+	"sidebar": [
+		{
+			"title": "API reference",
+			"pages": [["@oslojs/cbor", "/reference/main"]]
+		},
+		{
+			"title": "Links",
+			"pages": [
+				["GitHub", "https://github.com/oslo-project/binary"],
+				["Oslo", "https://oslojs.dev"],
+				["Twitter", "https://twitter.com/pilcrowonpaper"],
+				["Donate", "https://github.com/sponsors/pilcrowOnPaper"]
+			]
+		}
+	]
+}

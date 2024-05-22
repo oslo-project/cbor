@@ -16,7 +16,7 @@ import {
 
 import type { CBORValue } from "./cbor.js";
 
-export function transformCBORValueIntoNative(cbor: CBORValue<any>): unknown {
+export function transformCBORValueIntoNative(cbor: CBORValue): unknown {
 	if (cbor instanceof CBORPositiveInteger || cbor instanceof CBORNegativeInteger) {
 		if (cbor.isNumber()) {
 			return Number(cbor.value);

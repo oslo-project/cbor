@@ -4,7 +4,6 @@ import {
 	CBORArray,
 	CBORBreak,
 	CBORByteString,
-	CBORDataTooLargeError,
 	CBORFloat16,
 	CBORFloat32,
 	CBORFloat64,
@@ -18,9 +17,9 @@ import {
 	CBORTextString,
 	CBORTooDeepError
 } from "./cbor.js";
+import { VariableSizeBuffer } from "./binary.js";
 
 import type { CBORValue } from "./cbor.js";
-import { VariableSizeBuffer } from "./binary.js";
 
 export function decodeCBORIntoNativeNoLeftoverBytes(data: Uint8Array, maxDepth: number): unknown {
 	const decoded = decodeCBORNoLeftoverBytes(data, maxDepth);
@@ -35,7 +34,7 @@ export function decodeCBORIntoNative(
 	return [transformCBORValueIntoNative(decoded), size];
 }
 
-export function decodeCBORNoLeftoverBytes(data: Uint8Array, maxDepth: number): CBORValue<any> {
+export function decodeCBORNoLeftoverBytes(data: Uint8Array, maxDepth: number): CBORValue {
 	const [result, size] = decodeCBOR(data, maxDepth);
 	if (size !== data.byteLength) {
 		throw new CBORLeftoverBytesError(data.byteLength - size);
@@ -43,10 +42,7 @@ export function decodeCBORNoLeftoverBytes(data: Uint8Array, maxDepth: number): C
 	return result;
 }
 
-export function decodeCBOR(
-	data: Uint8Array,
-	maxDepth: number
-): [data: CBORValue<any>, size: number] {
+export function decodeCBOR(data: Uint8Array, maxDepth: number): [data: CBORValue, size: number] {
 	const [value, size] = decodeCBORIncludingBreaks(data, maxDepth, 0);
 	if (value instanceof CBORBreak) {
 		throw new CBORNotWellFormedError();
@@ -58,7 +54,7 @@ function decodeCBORIncludingBreaks(
 	data: Uint8Array,
 	maxDepth: number,
 	currentDepth: number
-): [data: CBORValue<any>, size: number] {
+): [data: CBORValue, size: number] {
 	if (currentDepth > maxDepth) {
 		throw new CBORTooDeepError();
 	}
@@ -121,11 +117,7 @@ function decodeCBORIncludingBreaks(
 					innerOffset = 1;
 				} else {
 					const innerArgumentSize = getArgumentSize(innerAdditionalInformation);
-					const value = getVariableUint(data, innerArgumentSize, offset + 1);
-					if (value > Number.MAX_SAFE_INTEGER) {
-						throw new CBORDataTooLargeError();
-					}
-					innerByteSize = Number(value);
+					innerByteSize = Number(getVariableUint(data, innerArgumentSize, offset + 1));
 					innerOffset = 1 + innerArgumentSize;
 				}
 				if (data.byteLength < offset + innerByteSize) {
@@ -145,11 +137,7 @@ function decodeCBORIncludingBreaks(
 			offset = 1;
 		} else {
 			const argumentSize = getArgumentSize(additionalInformation);
-			const value = getVariableUint(data, argumentSize, 1);
-			if (value > Number.MAX_SAFE_INTEGER) {
-				throw new CBORDataTooLargeError();
-			}
-			byteSize = Number(value);
+			byteSize = Number(getVariableUint(data, argumentSize, 1));
 			offset = 1 + argumentSize;
 		}
 		if (data.byteLength < offset + byteSize) {
@@ -192,11 +180,7 @@ function decodeCBORIncludingBreaks(
 					innerOffset = 1;
 				} else {
 					const innerArgumentSize = getArgumentSize(innerAdditionalInformation);
-					const value = getVariableUint(data, innerArgumentSize, offset + 1);
-					if (value > Number.MAX_SAFE_INTEGER) {
-						throw new CBORDataTooLargeError();
-					}
-					innerByteSize = Number(value);
+					innerByteSize = Number(getVariableUint(data, innerArgumentSize, offset + 1));
 					innerOffset = 1 + innerArgumentSize;
 				}
 				if (data.byteLength < offset + innerByteSize) {
@@ -215,11 +199,7 @@ function decodeCBORIncludingBreaks(
 			offset = 1;
 		} else {
 			const argumentSize = getArgumentSize(additionalInformation);
-			const value = getVariableUint(data, argumentSize, 1);
-			if (value > Number.MAX_SAFE_INTEGER) {
-				throw new CBORDataTooLargeError();
-			}
-			byteSize = Number(value);
+			byteSize = Number(getVariableUint(data, argumentSize, 1));
 			offset = 1 + argumentSize;
 		}
 		if (data.byteLength < offset + byteSize) {
@@ -235,7 +215,7 @@ function decodeCBORIncludingBreaks(
 		let offset = 1;
 		if (additionalInformation === 31) {
 			let size = offset;
-			const result = new CBORArray([]);
+			const value: CBORArray[] = [];
 			// eslint-disable-next-line no-constant-condition
 			while (true) {
 				const [element, elementByteSize] = decodeCBORIncludingBreaks(
@@ -248,9 +228,9 @@ function decodeCBORIncludingBreaks(
 					break;
 				}
 				offset += elementByteSize;
-				result.value.push(element);
+				value.push(element);
 			}
-			return [result, size];
+			return [new CBORArray(value), size];
 		}
 
 		let arraySize: number;
@@ -258,15 +238,11 @@ function decodeCBORIncludingBreaks(
 			arraySize = additionalInformation;
 		} else {
 			const argumentSize = getArgumentSize(additionalInformation);
-			const value = getVariableUint(data, argumentSize, 1);
-			if (value > Number.MAX_SAFE_INTEGER) {
-				throw new CBORDataTooLargeError();
-			}
-			arraySize = Number(value);
+			arraySize = Number(getVariableUint(data, argumentSize, 1));
 			offset += argumentSize;
 		}
 
-		const result = new CBORArray([]);
+		const value: CBORArray[] = new Array(arraySize);
 		let size = offset;
 		for (let i = 0; i < arraySize; i++) {
 			const [element, elementByteSize] = decodeCBORIncludingBreaks(
@@ -279,9 +255,9 @@ function decodeCBORIncludingBreaks(
 			}
 			offset += elementByteSize;
 			size += elementByteSize;
-			result.value.push(element);
+			value[i] = element;
 		}
-		return [result, size];
+		return [new CBORArray(value), size];
 	}
 
 	if (majorType === 5) {
@@ -290,34 +266,34 @@ function decodeCBORIncludingBreaks(
 		let offset = 1;
 		if (additionalInformation === 31) {
 			let size = offset;
-			const result = new CBORMap([]);
+			const value: [CBORValue, CBORValue][] = [];
 			// eslint-disable-next-line no-constant-condition
 			while (true) {
-				const [key, keyByteSize] = decodeCBORIncludingBreaks(
+				const [entryKey, keyByteSize] = decodeCBORIncludingBreaks(
 					data.subarray(offset),
 					maxDepth,
 					currentDepth + 1
 				);
-				if (key instanceof CBORBreak) {
+				if (entryKey instanceof CBORBreak) {
 					size += keyByteSize;
 					break;
 				}
 				offset += keyByteSize;
 				size += keyByteSize;
 
-				const [value, valueByteSize] = decodeCBORIncludingBreaks(
+				const [entryValue, valueByteSize] = decodeCBORIncludingBreaks(
 					data.subarray(offset),
 					maxDepth,
 					currentDepth + 1
 				);
-				if (value instanceof CBORBreak) {
+				if (entryValue instanceof CBORBreak) {
 					throw new CBORNotWellFormedError();
 				}
-				result.value.push([key, value]);
+				value.push([entryKey, entryValue]);
 				offset += valueByteSize;
 				size += valueByteSize;
 			}
-			return [result, size];
+			return [new CBORMap(value), size];
 		}
 
 		let pairCount: number;
@@ -325,41 +301,40 @@ function decodeCBORIncludingBreaks(
 			pairCount = additionalInformation;
 		} else {
 			const argumentSize = getArgumentSize(additionalInformation);
-			const value = getVariableUint(data, argumentSize, 1);
-			if (value > Number.MAX_SAFE_INTEGER) {
-				throw new CBORDataTooLargeError();
-			}
-			pairCount = Number(value);
+			pairCount = Number(getVariableUint(data, argumentSize, 1));
 			offset += argumentSize;
 		}
+		if (pairCount > data.byteLength) {
+			throw new CBORNotWellFormedError();
+		}
 
-		const result = new CBORMap([]);
+		const value: [CBORValue, CBORValue][] = new Array(pairCount);
 		let size = offset;
 		for (let i = 0; i < pairCount; i++) {
-			const [key, keyByteSize] = decodeCBORIncludingBreaks(
+			const [entryKey, keyByteSize] = decodeCBORIncludingBreaks(
 				data.subarray(offset),
 				maxDepth,
 				currentDepth + 1
 			);
-			if (key instanceof CBORBreak) {
+			if (entryKey instanceof CBORBreak) {
 				throw new CBORNotWellFormedError();
 			}
 			offset += keyByteSize;
 			size += keyByteSize;
 
-			const [value, valueByteSize] = decodeCBORIncludingBreaks(
+			const [entryValue, valueByteSize] = decodeCBORIncludingBreaks(
 				data.subarray(offset),
 				maxDepth,
 				currentDepth + 1
 			);
-			if (value instanceof CBORBreak) {
+			if (entryValue instanceof CBORBreak) {
 				throw new CBORNotWellFormedError();
 			}
-			result.value.push([key, value]);
+			value[i] = [entryKey, entryValue];
 			offset += valueByteSize;
 			size += valueByteSize;
 		}
-		return [result, size];
+		return [new CBORMap(value), size];
 	}
 
 	if (majorType === 6) {

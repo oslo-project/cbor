@@ -1,13 +1,11 @@
 import { compareBytes } from "@oslojs/binary";
 import { toFloat16, toFloat32, toFloat64 } from "./float.js";
 
-export interface CBORValue<T> {
-	majorType: number;
+export interface CBORValue<T = any> {
 	value: T;
 }
 
 export class CBORPositiveInteger implements CBORValue<bigint> {
-	public majorType = 0;
 	public value: bigint;
 
 	constructor(value: bigint) {
@@ -23,7 +21,6 @@ export class CBORPositiveInteger implements CBORValue<bigint> {
 }
 
 export class CBORNegativeInteger implements CBORValue<bigint> {
-	public majorType = 1;
 	public value: bigint;
 
 	constructor(value: bigint) {
@@ -39,7 +36,6 @@ export class CBORNegativeInteger implements CBORValue<bigint> {
 }
 
 export class CBORByteString implements CBORValue<Uint8Array> {
-	public majorType = 2;
 	public value: Uint8Array;
 
 	constructor(value: Uint8Array) {
@@ -48,7 +44,6 @@ export class CBORByteString implements CBORValue<Uint8Array> {
 }
 
 export class CBORTextString implements CBORValue<Uint8Array> {
-	public majorType = 3;
 	public value: Uint8Array;
 
 	constructor(value: Uint8Array) {
@@ -66,24 +61,22 @@ export class CBORTextString implements CBORValue<Uint8Array> {
 	}
 }
 
-export class CBORArray implements CBORValue<CBORValue<any>[]> {
-	public majorType = 4;
-	public value: CBORValue<any>[];
+export class CBORArray implements CBORValue<CBORValue[]> {
+	public value: CBORValue[];
 
-	constructor(value: CBORValue<any>[]) {
+	constructor(value: CBORValue[]) {
 		this.value = value;
 	}
 }
 
-export class CBORMap implements CBORValue<[CBORValue<any>, CBORValue<any>][]> {
-	public majorType = 5;
-	public value: [CBORValue<any>, CBORValue<any>][];
+export class CBORMap implements CBORValue<[CBORValue, CBORValue][]> {
+	public value: [CBORValue, CBORValue][];
 
-	constructor(value: [CBORValue<any>, CBORValue<any>][]) {
+	constructor(value: [CBORValue, CBORValue][]) {
 		this.value = value;
 	}
 
-	public has(key: CBORValue<any>): boolean {
+	public has(key: CBORValue): boolean {
 		for (const [entryKey] of this.value) {
 			if (compareCBORValues(key, entryKey)) {
 				return true;
@@ -92,7 +85,7 @@ export class CBORMap implements CBORValue<[CBORValue<any>, CBORValue<any>][]> {
 		return false;
 	}
 
-	public getFirst(key: CBORValue<any>): CBORValue<any> | null {
+	public get(key: CBORValue): CBORValue | null {
 		for (const [entryKey, entryValue] of this.value) {
 			if (compareCBORValues(key, entryKey)) {
 				return entryValue;
@@ -101,8 +94,8 @@ export class CBORMap implements CBORValue<[CBORValue<any>, CBORValue<any>][]> {
 		return null;
 	}
 
-	public getAll(key: CBORValue<any>): CBORValue<any>[] {
-		const result: CBORValue<any>[] = [];
+	public getAll(key: CBORValue): CBORValue[] {
+		const result: CBORValue[] = [];
 		for (const [entryKey, entryValue] of this.value) {
 			if (compareCBORValues(key, entryKey)) {
 				result.push(entryValue);
@@ -124,7 +117,6 @@ export class CBORMap implements CBORValue<[CBORValue<any>, CBORValue<any>][]> {
 }
 
 export class CBORFloat16 implements CBORValue<Uint8Array> {
-	public majorType = 7;
 	public value: Uint8Array;
 
 	constructor(value: Uint8Array) {
@@ -140,7 +132,6 @@ export class CBORFloat16 implements CBORValue<Uint8Array> {
 }
 
 export class CBORFloat32 implements CBORValue<Uint8Array> {
-	public majorType = 7;
 	public value: Uint8Array;
 
 	constructor(value: Uint8Array) {
@@ -156,7 +147,6 @@ export class CBORFloat32 implements CBORValue<Uint8Array> {
 }
 
 export class CBORFloat64 implements CBORValue<Uint8Array> {
-	public majorType = 7;
 	public value: Uint8Array;
 
 	constructor(value: Uint8Array) {
@@ -172,7 +162,6 @@ export class CBORFloat64 implements CBORValue<Uint8Array> {
 }
 
 export class CBORTaggedValue<T> implements CBORValue<T> {
-	public majorType = 6;
 	public tagNumber: bigint;
 	public value: T;
 
@@ -183,7 +172,6 @@ export class CBORTaggedValue<T> implements CBORValue<T> {
 }
 
 export class CBORSimple implements CBORValue<number> {
-	public majorType = 7;
 	public value: number;
 
 	constructor(value: number) {
@@ -192,11 +180,10 @@ export class CBORSimple implements CBORValue<number> {
 }
 
 export class CBORBreak implements CBORValue<never> {
-	public majorType: number = 7;
 	public value: never;
 }
 
-export function compareCBORValues(a: CBORValue<any>, b: CBORValue<any>): boolean {
+export function compareCBORValues(a: CBORValue, b: CBORValue): boolean {
 	if (a instanceof CBORPositiveInteger && b instanceof CBORPositiveInteger) {
 		return a.value === b.value;
 	}
@@ -278,12 +265,6 @@ export class CBORLeftoverBytesError extends Error {
 export class CBORTooDeepError extends Error {
 	constructor() {
 		super("Exceeds maximum depth");
-	}
-}
-
-export class CBORDataTooLargeError extends Error {
-	constructor() {
-		super("Data too large");
 	}
 }
 

@@ -1,6 +1,5 @@
 export {
 	CBORArray,
-	CBORBreak,
 	CBORByteString,
 	CBORFloat16,
 	CBORFloat32,
@@ -13,7 +12,6 @@ export {
 	CBORTextString
 } from "./cbor.js";
 export {
-	CBORDataTooLargeError,
 	CBORInvalidError,
 	CBORLeftoverBytesError,
 	CBORNotWellFormedError,
