@@ -55,7 +55,7 @@ export function transformCBORValueIntoNative(cbor: CBORValue): unknown {
 		return result;
 	}
 	if (cbor instanceof CBORMap) {
-		const result: object = {};
+		const result: Record<any, any> = {};
 		for (let i = 0; i < cbor.value.length; i++) {
 			const [entryKey, entryValue] = cbor.value[i];
 			let stringifiedKey: string;

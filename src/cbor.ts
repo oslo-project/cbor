@@ -179,8 +179,8 @@ export class CBORSimple implements CBORValue<number> {
 	}
 }
 
-export class CBORBreak implements CBORValue<never> {
-	public value: never;
+export class CBORBreak implements CBORValue<null> {
+	public value = null;
 }
 
 export function compareCBORValues(a: CBORValue, b: CBORValue): boolean {

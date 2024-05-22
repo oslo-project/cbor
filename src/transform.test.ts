@@ -11,7 +11,7 @@ import {
 	CBORTextString,
 	CBORInvalidError
 } from "./cbor.js";
-import { transformCBORValueIntoNative } from "./transform";
+import { transformCBORValueIntoNative } from "./transform.js";
 
 describe("transformCBORValueIntoNative()", () => {
 	test("transform", () => {

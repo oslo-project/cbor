@@ -1,5 +1,5 @@
 import { expect, test } from "vitest";
-import { toFloat16, toFloat32, toFloat64 } from "./float";
+import { toFloat16, toFloat32, toFloat64 } from "./float.js";
 
 test("toFloat16", () => {
 	expect(toFloat16(new Uint8Array([0, 0]))).toBe(0);
