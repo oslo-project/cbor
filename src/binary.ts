@@ -27,7 +27,7 @@ export class VariableSizeBuffer {
 		this.length += data.byteLength;
 	}
 
-	public read(target: Uint8Array): void {
+	public readInto(target: Uint8Array): void {
 		if (target.byteLength < this.length) {
 			throw new TypeError("Not enough space");
 		}
