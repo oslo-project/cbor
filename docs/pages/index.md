@@ -4,6 +4,8 @@ title: "@oslojs/cbor documentation"
 
 # @oslojs/cbor
 
+**This package is highly experimental!**
+
 A CBOR library for JavaScript based on [RFC 8949](https://datatracker.ietf.org/doc/html/rfc8949) by [Oslo](https://oslojs.dev).
 
 It provides APIs for working with CBOR values as well as native JS values.
