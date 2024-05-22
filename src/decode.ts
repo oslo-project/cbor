@@ -1,4 +1,4 @@
-import { bigEndian } from "@oslojs/binary";
+import { bigEndian, DynamicBuffer } from "@oslojs/binary";
 import { transformCBORValueIntoNative } from "./transform.js";
 import {
 	CBORArray,
@@ -17,7 +17,6 @@ import {
 	CBORTextString,
 	CBORTooDeepError
 } from "./cbor.js";
-import { VariableSizeBuffer } from "./binary.js";
 
 import type { CBORValue } from "./cbor.js";
 
@@ -92,7 +91,7 @@ function decodeCBORIncludingBreaks(
 		if (additionalInformation === 31) {
 			let offset = 1;
 			let size = offset;
-			const buffer = new VariableSizeBuffer(0);
+			const buffer = new DynamicBuffer(0);
 			// eslint-disable-next-line no-constant-condition
 			while (true) {
 				if (data.byteLength < offset + 1) {
@@ -154,7 +153,7 @@ function decodeCBORIncludingBreaks(
 		if (additionalInformation === 31) {
 			offset = 1;
 			let size = offset;
-			const buffer = new VariableSizeBuffer(0);
+			const buffer = new DynamicBuffer(0);
 			// eslint-disable-next-line no-constant-condition
 			while (true) {
 				if (data.byteLength < offset + 1) {
