@@ -4,7 +4,7 @@ title: "decodeCBOR()"
 
 # decodeCBOR()
 
-Decodes the CBOR-encoded data and returns the decoded value as [`CBORValue`](/reference/main/CBORValue) (e.g. `CBORMap`) and the number of bytes decoded. Use [`decodeCBORNoLeftoverBytes()`](/reference/main/decodeCBORNoLeftoverBytes) if you don't expect any leftover bytes.
+Decodes a CBOR-encoded data and returns the decoded value as [`CBORValue`](/reference/main/CBORValue) (e.g. `CBORMap`) and the number of bytes decoded. Use [`decodeCBORNoLeftoverBytes()`](/reference/main/decodeCBORNoLeftoverBytes) if you don't expect any leftover bytes.
 
 This method does NOT check for CBOR [validity](https://datatracker.ietf.org/doc/html/rfc8949#name-terminology). As such, it will NOT throw on:
 
