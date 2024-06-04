@@ -16,6 +16,6 @@ interface CBORValue<T = any> {
 
 - `T`
 
-### Parameters
+### Properties
 
 - `value`
