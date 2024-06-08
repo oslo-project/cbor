@@ -33,4 +33,5 @@ interface Result {
 ```
 npm i @oslojs/cbor
 ```
+
 ˝
