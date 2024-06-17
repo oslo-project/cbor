@@ -4,8 +4,6 @@ title: "CBORPositiveInteger"
 
 # CBORPositiveInteger
 
-_Implements [`CBORValue`](/reference/main/CBORValue)._
-
 Represents a CBOR positive integer (major type 0).
 
 ## Constructor

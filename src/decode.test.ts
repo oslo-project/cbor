@@ -11,7 +11,7 @@ import {
 	CBORNotWellFormedError,
 	CBORPositiveInteger,
 	CBORSimple,
-	CBORTaggedValue,
+	CBORTagged,
 	CBORTextString,
 	CBORTooDeepError
 } from "./cbor.js";
@@ -142,7 +142,7 @@ describe("decodeCBORNoLeftoverBytes()", () => {
 				],
 				[
 					new CBORTextString(new TextEncoder().encode("big")),
-					new CBORTaggedValue(
+					new CBORTagged(
 						2n,
 						new CBORByteString(
 							new Uint8Array([
@@ -153,7 +153,7 @@ describe("decodeCBORNoLeftoverBytes()", () => {
 				],
 				[
 					new CBORTextString(new TextEncoder().encode("negative_big")),
-					new CBORTaggedValue(
+					new CBORTagged(
 						3n,
 						new CBORByteString(
 							new Uint8Array([
@@ -166,10 +166,7 @@ describe("decodeCBORNoLeftoverBytes()", () => {
 				[new CBORTextString(new TextEncoder().encode("false")), new CBORSimple(20)],
 				[
 					new CBORTextString(new TextEncoder().encode("date")),
-					new CBORTaggedValue(
-						0n,
-						new CBORTextString(new TextEncoder().encode("2020-01-01T09:00:00Z"))
-					)
+					new CBORTagged(0n, new CBORTextString(new TextEncoder().encode("2020-01-01T09:00:00Z")))
 				]
 			])
 		);

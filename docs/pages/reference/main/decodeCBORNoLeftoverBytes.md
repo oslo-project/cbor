@@ -4,7 +4,7 @@ title: "decodeCBORNoLeftoverBytes()"
 
 # decodeCBORNoLeftoverBytes()
 
-Decodes the CBOR-encoded data and returns the decoded value as [`CBORValue`](/reference/main/CBORValue) (e.g. `CBORMap`). See [`decodeCBOR()`](/reference/main/decodeCBOR) for details on errors and behavior.
+Decodes the CBOR-encoded data and returns the decoded value as [`CBORValue`](/reference/main/CBORValue). See [`decodeCBOR()`](/reference/main/decodeCBOR) for details on errors and behavior.
 
 In addition to errors thrown by `decodeCBOR()`, it will also throw [`CBORLeftoverBytesError`](/reference/main/CBORLeftoverBytesError) if there are any leftover bytes.
 
@@ -18,4 +18,4 @@ function decodeCBORNoLeftoverBytes(data: Uint8Array, maxDepth: number): $$CBORVa
 ### Parameters
 
 - `data`
-- `maxDepth`: How much nesting is allowed
+- `maxDepth`: How much nesting is allowed (exclusive) where the first iteration is depth 0.

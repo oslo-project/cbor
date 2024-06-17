@@ -4,27 +4,26 @@ title: "CBORArray"
 
 # CBORArray
 
-_Implements [`CBORValue`](/reference/main/CBORValue)._
-
 Represents a CBOR array (major type 4).
 
 ## Constructor
 
 ```ts
 //$ CBORValue=/reference/main/CBORValue
-function constructor(value: CBORValue[]): this;
+function constructor(elements: $$CBORValue[]): this;
 ```
 
 ### Parameters
 
-- `value`
+- `elements`
 
 ## Properties
 
 ```ts
+//$ CBORValue=/reference/main/CBORValue
 interface Properties {
-	value: CBORValue[];
+	value: $$CBORValue[];
 }
 ```
 
-- `value`
+- `elements`

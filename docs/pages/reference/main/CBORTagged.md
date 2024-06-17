@@ -1,10 +1,8 @@
 ---
-title: "CBORTaggedValue"
+title: "CBORTagged"
 ---
 
 # CBORTaggedValue
-
-_Implements [`CBORValue`](/reference/main/CBORValue)._
 
 Represents a CBOR tagged value (major type 7).
 
@@ -12,7 +10,7 @@ Represents a CBOR tagged value (major type 7).
 
 ```ts
 //$ CBORValue=/reference/main/CBORValue
-function constructor(tagNumber: bigint, value: CBORValue): this;
+function constructor(tagNumber: bigint, value: $$CBORValue): this;
 ```
 
 ### Parameters
@@ -23,9 +21,12 @@ function constructor(tagNumber: bigint, value: CBORValue): this;
 ## Properties
 
 ```ts
+//$ CBORValue=/reference/main/CBORValue
 interface Properties {
-	value: number;
+	tagNumber: number;
+	value: $$CBORValue;
 }
 ```
 
+- `tagNumber`
 - `value`

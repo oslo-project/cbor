@@ -1,4 +1,3 @@
-import { toBigIntBigEndian } from "./big.js";
 import {
 	CBORArray,
 	CBORByteString,
@@ -10,13 +9,13 @@ import {
 	CBORNegativeInteger,
 	CBORPositiveInteger,
 	CBORSimple,
-	CBORTaggedValue,
+	CBORTagged,
 	CBORTextString
 } from "./cbor.js";
 
 import type { CBORValue } from "./cbor.js";
 
-export function transformCBORValueIntoNative(cbor: CBORValue): unknown {
+export function transformCBORValueToNative(cbor: CBORValue): unknown {
 	if (cbor instanceof CBORPositiveInteger || cbor instanceof CBORNegativeInteger) {
 		if (cbor.isNumber()) {
 			return Number(cbor.value);
@@ -24,7 +23,7 @@ export function transformCBORValueIntoNative(cbor: CBORValue): unknown {
 		return cbor.value;
 	}
 	if (cbor instanceof CBORTextString) {
-		return cbor.decode();
+		return cbor.decodeText();
 	}
 	if (cbor instanceof CBORByteString) {
 		return cbor.value;
@@ -45,29 +44,26 @@ export function transformCBORValueIntoNative(cbor: CBORValue): unknown {
 		if (cbor.value === 23) {
 			return undefined;
 		}
-		return cbor;
+		throw new CBORInvalidError();
 	}
 	if (cbor instanceof CBORArray) {
-		const result = new Array(cbor.value.length);
-		for (let i = 0; i < cbor.value.length; i++) {
-			result[i] = transformCBORValueIntoNative(cbor.value[i]);
+		const result = new Array(cbor.elements.length);
+		for (let i = 0; i < cbor.elements.length; i++) {
+			result[i] = transformCBORValueToNative(cbor.elements[i]);
 		}
 		return result;
 	}
 	if (cbor instanceof CBORMap) {
 		const result: Record<any, any> = {};
-		for (let i = 0; i < cbor.value.length; i++) {
-			const [entryKey, entryValue] = cbor.value[i];
+		for (let i = 0; i < cbor.entries.length; i++) {
+			const [entryKey, entryValue] = cbor.entries[i];
 			let stringifiedKey: string;
 			if (entryKey instanceof CBORTextString) {
-				stringifiedKey = entryKey.decode();
+				stringifiedKey = entryKey.decodeText();
 			} else if (
 				entryKey instanceof CBORPositiveInteger ||
 				entryKey instanceof CBORNegativeInteger
 			) {
-				if (Number.isNaN(entryKey.value)) {
-					throw new CBORInvalidError();
-				}
 				stringifiedKey = entryKey.value.toString();
 			} else if (
 				entryKey instanceof CBORFloat16 ||
@@ -82,66 +78,18 @@ export function transformCBORValueIntoNative(cbor: CBORValue): unknown {
 			} else {
 				throw new CBORInvalidError();
 			}
+			if (stringifiedKey === "__proto__") {
+				throw new CBORInvalidError();
+			}
 			if (stringifiedKey in result) {
 				throw new CBORInvalidError();
 			}
-			result[stringifiedKey] = transformCBORValueIntoNative(entryValue);
+			result[stringifiedKey] = transformCBORValueToNative(entryValue);
 		}
 		return result;
 	}
-	if (cbor instanceof CBORTaggedValue) {
-		if (cbor.tagNumber === 0n) {
-			if (cbor.value instanceof CBORTextString) {
-				return new Date(cbor.value.decode());
-			}
-			throw new CBORInvalidError();
-		}
-		if (cbor.tagNumber === 1n) {
-			if (cbor.value instanceof CBORPositiveInteger) {
-				if (cbor.value.value > Number.MAX_SAFE_INTEGER / 1000) {
-					throw new CBORInvalidError();
-				}
-				return new Date(Number(cbor.value.value) * 1000);
-			}
-			if (cbor.value instanceof CBORNegativeInteger) {
-				if (cbor.value.value < (Number.MIN_SAFE_INTEGER + 1) / 1000) {
-					throw new CBORInvalidError();
-				}
-				return new Date(Number(-1 - Number(cbor.value.value)) * 1000);
-			}
-			if (
-				cbor.value instanceof CBORFloat16 ||
-				cbor.value instanceof CBORFloat32 ||
-				cbor.value instanceof CBORFloat64
-			) {
-				const posix = cbor.value.toNumber();
-				if (Number.isNaN(posix)) {
-					throw new CBORInvalidError();
-				}
-				if (posix > Number.MAX_SAFE_INTEGER / 1000) {
-					throw new CBORInvalidError();
-				}
-				if (posix < Number.MIN_SAFE_INTEGER / 1000) {
-					throw new CBORInvalidError();
-				}
-				return new Date(posix * 1000);
-			}
-			throw new CBORInvalidError();
-		}
-		if (cbor.tagNumber === 2n) {
-			if (cbor.value instanceof CBORByteString) {
-				return toBigIntBigEndian(cbor.value.value);
-			}
-			throw new CBORInvalidError();
-		}
-		if (cbor.tagNumber === 3n) {
-			if (cbor.value instanceof CBORByteString) {
-				return -1n - toBigIntBigEndian(cbor.value.value);
-			}
-			throw new CBORInvalidError();
-		}
-		return cbor;
+	if (cbor instanceof CBORTagged) {
+		return transformCBORValueToNative(cbor.value);
 	}
-
 	throw new CBORInvalidError();
 }

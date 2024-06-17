@@ -4,8 +4,6 @@ title: "CBORByteString"
 
 # CBORByteString
 
-_Implements [`CBORValue`](/reference/main/CBORValue)._
-
 Represents a CBOR byte string (major type 2).
 
 ## Constructor

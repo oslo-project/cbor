@@ -4,8 +4,6 @@ title: "CBORFloat16"
 
 # CBORFloat16
 
-_Implements [`CBORValue`](/reference/main/CBORValue)._
-
 Represents a CBOR float16 (major type 7).
 
 ## Constructor

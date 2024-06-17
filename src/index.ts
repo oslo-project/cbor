@@ -8,7 +8,8 @@ export {
 	CBORNegativeInteger,
 	CBORPositiveInteger,
 	CBORSimple,
-	CBORTaggedValue,
+	CBORTagged,
+	CBORBreak,
 	CBORTextString
 } from "./cbor.js";
 export {
@@ -19,9 +20,10 @@ export {
 } from "./cbor.js";
 export {
 	decodeCBOR,
-	decodeCBORIntoNative,
-	decodeCBORIntoNativeNoLeftoverBytes,
+	decodeCBORToNativeValueNoLeftoverBytes,
+	decodeCBORToNativeValue,
 	decodeCBORNoLeftoverBytes
 } from "./decode.js";
+export { transformCBORValueToNative } from "./transform.js";
 
 export type { CBORValue } from "./cbor.js";

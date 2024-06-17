@@ -1,11 +1,21 @@
 import { compareBytes } from "@oslojs/binary";
 import { toFloat16, toFloat32, toFloat64 } from "./float.js";
 
-export interface CBORValue<T = any> {
-	value: T;
-}
+export type CBORValue =
+	| CBORPositiveInteger
+	| CBORNegativeInteger
+	| CBORByteString
+	| CBORTextString
+	| CBORArray
+	| CBORMap
+	| CBORFloat16
+	| CBORFloat32
+	| CBORFloat64
+	| CBORTagged
+	| CBORSimple
+	| CBORBreak;
 
-export class CBORPositiveInteger implements CBORValue<bigint> {
+export class CBORPositiveInteger {
 	public value: bigint;
 
 	constructor(value: bigint) {
@@ -20,7 +30,7 @@ export class CBORPositiveInteger implements CBORValue<bigint> {
 	}
 }
 
-export class CBORNegativeInteger implements CBORValue<bigint> {
+export class CBORNegativeInteger {
 	public value: bigint;
 
 	constructor(value: bigint) {
@@ -35,7 +45,7 @@ export class CBORNegativeInteger implements CBORValue<bigint> {
 	}
 }
 
-export class CBORByteString implements CBORValue<Uint8Array> {
+export class CBORByteString {
 	public value: Uint8Array;
 
 	constructor(value: Uint8Array) {
@@ -43,14 +53,14 @@ export class CBORByteString implements CBORValue<Uint8Array> {
 	}
 }
 
-export class CBORTextString implements CBORValue<Uint8Array> {
+export class CBORTextString {
 	public value: Uint8Array;
 
 	constructor(value: Uint8Array) {
 		this.value = value;
 	}
 
-	public decode(): string {
+	public decodeText(): string {
 		try {
 			return new TextDecoder("utf-8", {
 				fatal: true
@@ -61,23 +71,23 @@ export class CBORTextString implements CBORValue<Uint8Array> {
 	}
 }
 
-export class CBORArray implements CBORValue<CBORValue[]> {
-	public value: CBORValue[];
+export class CBORArray {
+	public elements: CBORValue[];
 
-	constructor(value: CBORValue[]) {
-		this.value = value;
+	constructor(elements: CBORValue[]) {
+		this.elements = elements;
 	}
 }
 
-export class CBORMap implements CBORValue<[CBORValue, CBORValue][]> {
-	public value: [CBORValue, CBORValue][];
+export class CBORMap {
+	public entries: [CBORValue, CBORValue][];
 
-	constructor(value: [CBORValue, CBORValue][]) {
-		this.value = value;
+	constructor(entries: [CBORValue, CBORValue][]) {
+		this.entries = entries;
 	}
 
 	public has(key: CBORValue): boolean {
-		for (const [entryKey] of this.value) {
+		for (const [entryKey] of this.entries) {
 			if (compareCBORValues(key, entryKey)) {
 				return true;
 			}
@@ -86,7 +96,7 @@ export class CBORMap implements CBORValue<[CBORValue, CBORValue][]> {
 	}
 
 	public get(key: CBORValue): CBORValue | null {
-		for (const [entryKey, entryValue] of this.value) {
+		for (const [entryKey, entryValue] of this.entries) {
 			if (compareCBORValues(key, entryKey)) {
 				return entryValue;
 			}
@@ -96,7 +106,7 @@ export class CBORMap implements CBORValue<[CBORValue, CBORValue][]> {
 
 	public getAll(key: CBORValue): CBORValue[] {
 		const result: CBORValue[] = [];
-		for (const [entryKey, entryValue] of this.value) {
+		for (const [entryKey, entryValue] of this.entries) {
 			if (compareCBORValues(key, entryKey)) {
 				result.push(entryValue);
 			}
@@ -105,9 +115,9 @@ export class CBORMap implements CBORValue<[CBORValue, CBORValue][]> {
 	}
 
 	public hasDuplicateKeys(): boolean {
-		for (let i = 0; i < this.value.length; i++) {
-			for (let j = i + 1; j < this.value.length; j++) {
-				if (compareCBORValues(this.value[i][0], this.value[j][0])) {
+		for (let i = 0; i < this.entries.length; i++) {
+			for (let j = i + 1; j < this.entries.length; j++) {
+				if (compareCBORValues(this.entries[i][0], this.entries[j][0])) {
 					return true;
 				}
 			}
@@ -116,7 +126,7 @@ export class CBORMap implements CBORValue<[CBORValue, CBORValue][]> {
 	}
 }
 
-export class CBORFloat16 implements CBORValue<Uint8Array> {
+export class CBORFloat16 {
 	public value: Uint8Array;
 
 	constructor(value: Uint8Array) {
@@ -131,7 +141,7 @@ export class CBORFloat16 implements CBORValue<Uint8Array> {
 	}
 }
 
-export class CBORFloat32 implements CBORValue<Uint8Array> {
+export class CBORFloat32 {
 	public value: Uint8Array;
 
 	constructor(value: Uint8Array) {
@@ -146,7 +156,7 @@ export class CBORFloat32 implements CBORValue<Uint8Array> {
 	}
 }
 
-export class CBORFloat64 implements CBORValue<Uint8Array> {
+export class CBORFloat64 {
 	public value: Uint8Array;
 
 	constructor(value: Uint8Array) {
@@ -161,17 +171,17 @@ export class CBORFloat64 implements CBORValue<Uint8Array> {
 	}
 }
 
-export class CBORTaggedValue<T> implements CBORValue<T> {
+export class CBORTagged {
 	public tagNumber: bigint;
-	public value: T;
+	public value: CBORValue;
 
-	constructor(tagNumber: bigint, value: T) {
+	constructor(tagNumber: bigint, value: CBORValue) {
 		this.tagNumber = tagNumber;
 		this.value = value;
 	}
 }
 
-export class CBORSimple implements CBORValue<number> {
+export class CBORSimple {
 	public value: number;
 
 	constructor(value: number) {
@@ -179,7 +189,7 @@ export class CBORSimple implements CBORValue<number> {
 	}
 }
 
-export class CBORBreak implements CBORValue<null> {
+export class CBORBreak {
 	public value = null;
 }
 
@@ -199,7 +209,7 @@ export function compareCBORValues(a: CBORValue, b: CBORValue): boolean {
 	if (a instanceof CBORSimple && b instanceof CBORSimple) {
 		return a.value === b.value;
 	}
-	if (a instanceof CBORTaggedValue && b instanceof CBORTaggedValue) {
+	if (a instanceof CBORTagged && b instanceof CBORTagged) {
 		return a.tagNumber === b.tagNumber && compareCBORValues(a.value, b.value);
 	}
 	if (a instanceof CBORFloat16 && b instanceof CBORFloat16) {
@@ -212,28 +222,28 @@ export function compareCBORValues(a: CBORValue, b: CBORValue): boolean {
 		return compareBytes(a.value, b.value);
 	}
 	if (a instanceof CBORArray && b instanceof CBORArray) {
-		if (a.value.length !== b.value.length) {
+		if (a.elements.length !== b.elements.length) {
 			return false;
 		}
-		for (let i = 0; i < a.value.length; i++) {
-			if (!compareCBORValues(a.value[i], b.value[i])) {
+		for (let i = 0; i < a.elements.length; i++) {
+			if (!compareCBORValues(a.elements[i], b.elements[i])) {
 				return false;
 			}
 		}
 		return true;
 	}
 	if (a instanceof CBORMap && b instanceof CBORMap) {
-		if (a.value.length !== b.value.length) {
+		if (a.entries.length !== b.entries.length) {
 			return false;
 		}
 		const checkedIndexes: number[] = [];
-		for (let i = 0; i < a.value.length; i++) {
-			for (let j = 0; j < b.value.length; j++) {
+		for (let i = 0; i < a.entries.length; i++) {
+			for (let j = 0; j < b.entries.length; j++) {
 				if (!checkedIndexes.includes(i)) {
-					if (!compareCBORValues(a.value[i][0], b.value[j][0])) {
+					if (!compareCBORValues(a.entries[i][0], b.entries[j][0])) {
 						continue;
 					}
-					if (!compareCBORValues(a.value[i][1], b.value[j][1])) {
+					if (!compareCBORValues(a.entries[i][1], b.entries[j][1])) {
 						// Support duplicate keys
 						continue;
 					}

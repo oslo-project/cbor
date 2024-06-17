@@ -7,11 +7,11 @@ import {
 	CBORNegativeInteger,
 	CBORPositiveInteger,
 	CBORSimple,
-	CBORTaggedValue,
+	CBORTagged,
 	CBORTextString,
 	CBORInvalidError
 } from "./cbor.js";
-import { transformCBORValueIntoNative } from "./transform.js";
+import { transformCBORValueToNative } from "./transform.js";
 
 describe("transformCBORValueIntoNative()", () => {
 	test("transform", () => {
@@ -86,8 +86,8 @@ describe("transformCBORValueIntoNative()", () => {
 				])
 			],
 			[
-				new CBORTextString(new TextEncoder().encode("big")),
-				new CBORTaggedValue(
+				new CBORTextString(new TextEncoder().encode("tagged")),
+				new CBORTagged(
 					2n,
 					new CBORByteString(
 						new Uint8Array([
@@ -96,29 +96,17 @@ describe("transformCBORValueIntoNative()", () => {
 					)
 				)
 			],
-			[
-				new CBORTextString(new TextEncoder().encode("negative_big")),
-				new CBORTaggedValue(
-					3n,
-					new CBORByteString(
-						new Uint8Array([
-							0x30, 0xaf, 0xe2, 0xbf, 0x5e, 0xb8, 0x3b, 0x02, 0xa6, 0xc5, 0xe2, 0x01, 0xaa
-						])
-					)
-				)
-			],
-			[new CBORTextString(new TextEncoder().encode("true")), new CBORSimple(21)],
 			[new CBORTextString(new TextEncoder().encode("false")), new CBORSimple(20)],
+			[new CBORTextString(new TextEncoder().encode("true")), new CBORSimple(21)],
+			[new CBORTextString(new TextEncoder().encode("null")), new CBORSimple(22)],
+			[new CBORTextString(new TextEncoder().encode("undefined")), new CBORSimple(23)],
 			[
-				new CBORTextString(new TextEncoder().encode("date")),
-				new CBORTaggedValue(
-					0n,
-					new CBORTextString(new TextEncoder().encode("2020-01-01T09:00:00Z"))
-				)
+				new CBORTextString(new TextEncoder().encode("byte_string")),
+				new CBORByteString(new Uint8Array([0x01, 0x02, 0x03, 0x04, 0x05]))
 			]
 		]);
 
-		expect(transformCBORValueIntoNative(cbor)).toStrictEqual({
+		expect(transformCBORValueToNative(cbor)).toStrictEqual({
 			text: "Have you been alright, through all those lonely lonely lonely lonely nights",
 			positive_int: 38684364984,
 			negative_int: -38684364984,
@@ -145,23 +133,26 @@ describe("transformCBORValueIntoNative()", () => {
 				spanish: "hola"
 			},
 			float: 3.1415926,
-			big: 3857385798357923875983275983275n,
-			negative_big: -3857385798357923875983275983275n,
 			true: true,
 			false: false,
-			date: new Date("2020-01-01T09:00:00Z")
+			null: null,
+			undefined: undefined,
+			byte_string: new Uint8Array([0x01, 0x02, 0x03, 0x04, 0x05]),
+			tagged: new Uint8Array([
+				0x30, 0xaf, 0xe2, 0xbf, 0x5e, 0xb8, 0x3b, 0x02, 0xa6, 0xc5, 0xe2, 0x01, 0xab
+			])
 		});
 	});
 
 	test("CBORInvalidError on invalid utf-8", () => {
 		expect(() =>
-			transformCBORValueIntoNative(new CBORTextString(new Uint8Array([0x80, 0x80])))
+			transformCBORValueToNative(new CBORTextString(new Uint8Array([0x80, 0x80])))
 		).toThrowError(CBORInvalidError);
 	});
 
 	test("CBORInvalidError on duplicate keys", () => {
 		expect(() =>
-			transformCBORValueIntoNative(
+			transformCBORValueToNative(
 				new CBORMap([
 					[
 						new CBORTextString(new TextEncoder().encode("message")),
@@ -169,6 +160,19 @@ describe("transformCBORValueIntoNative()", () => {
 					],
 					[
 						new CBORTextString(new TextEncoder().encode("message")),
+						new CBORTextString(new TextEncoder().encode("hello"))
+					]
+				])
+			)
+		).toThrowError(CBORInvalidError);
+	});
+
+	test("CBORInvalidError on __proto__ key", () => {
+		expect(() =>
+			transformCBORValueToNative(
+				new CBORMap([
+					[
+						new CBORTextString(new TextEncoder().encode("__proto__")),
 						new CBORTextString(new TextEncoder().encode("hello"))
 					]
 				])

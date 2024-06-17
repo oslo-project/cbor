@@ -4,8 +4,6 @@ title: "CBORNegativeInteger"
 
 # CBORNegativeInteger
 
-_Implements [`CBORValue`](/reference/main/CBORValue)._
-
 Represents a CBOR negative integer (major type 1).
 
 ## Constructor

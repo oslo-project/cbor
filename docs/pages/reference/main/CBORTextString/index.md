@@ -4,8 +4,6 @@ title: "CBORTextString"
 
 # CBORTextString
 
-_Implements [`CBORValue`](/reference/main/CBORValue)._
-
 Represents a CBOR text string (major type 3).
 
 ## Constructor

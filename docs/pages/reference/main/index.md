@@ -25,10 +25,11 @@ title: "@oslojs/cbor"
 ## Functions
 
 - [`decodeCBOR()`](/reference/main/decodeCBOR)
-- [`decodeCBORIntoNative()`](/reference/main/decodeCBORIntoNative)
-- [`decodeCBORIntoNativeNoLeftoverBytes()`](/reference/main/decodeCBORIntoNativeNoLeftoverBytes)
 - [`decodeCBORNoLeftoverBytes()`](/reference/main/decodeCBORNoLeftoverBytes)
+- [`decodeCBORToNativeValue()`](/reference/main/decodeCBORToNativeValue)
+- [`decodeCBORToNativeValueNoLeftoverBytes()`](/reference/main/decodeCBORToNativeValueNoLeftoverBytes)
+- [`transformCBORValueToNative()`](/reference/main/transformCBORValueToNative)
 
-## Interfaces
+## Types
 
 - [`CBORValue`](/reference/main/CBORValue)

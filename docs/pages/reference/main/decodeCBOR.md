@@ -4,7 +4,7 @@ title: "decodeCBOR()"
 
 # decodeCBOR()
 
-Decodes a CBOR-encoded data and returns the decoded value as [`CBORValue`](/reference/main/CBORValue) (e.g. `CBORMap`) and the number of bytes decoded. Use [`decodeCBORNoLeftoverBytes()`](/reference/main/decodeCBORNoLeftoverBytes) if you don't expect any leftover bytes.
+Decodes a CBOR-encoded data and returns the decoded value as [`CBORValue`](/reference/main/CBORValue) and the number of bytes decoded. Use [`decodeCBORNoLeftoverBytes()`](/reference/main/decodeCBORNoLeftoverBytes) if you don't expect any leftover bytes.
 
 This method does NOT check for CBOR [validity](https://datatracker.ietf.org/doc/html/rfc8949#name-terminology). As such, it will NOT throw on:
 
@@ -12,7 +12,7 @@ This method does NOT check for CBOR [validity](https://datatracker.ietf.org/doc/
 - Maps with duplicate keys
 - Tagged values with invalid content type (e.g. date value with an array value)
 
-Passing tag #55799 (self-described CBOR) returns the tagged value, not `CBORTaggedValue`.
+Passing tag #55799 (self-described CBOR) returns the tagged value, not [`CBORTaggedValue`](/reference/main/CBORTaggedValue).
 
 It can throw one of:
 
@@ -29,4 +29,4 @@ function decodeCBOR(data: Uint8Array, maxDepth: number): [data: $$CBORValue, siz
 ### Parameters
 
 - `data`
-- `maxDepth`: How much nesting is allowed
+- `maxDepth`: How much nesting is allowed (exclusive) where the first iteration is depth 0.
