@@ -1,8 +1,8 @@
 ---
-title: "decodeCBORIntoNativeNoLeftoverBytes()"
+title: "decodeCBORToNativeValueNoLeftoverBytes()"
 ---
 
-# decodeCBORIntoNativeNoLeftoverBytes()
+# decodeCBORToNativeValueNoLeftoverBytes()
 
 Decodes a CBOR-encoded data and returns the decoded value as native JS values. See [`decodeCBORToNativeValue()`](/reference/main/decodeCBORToNativeValue) for details on errors and behavior.
 
@@ -11,7 +11,7 @@ In addition to errors thrown by `decodeCBORToNativeValue()`, it will also throw 
 ## Definition
 
 ```ts
-function decodeCBORIntoNativeNoLeftoverBytes(data: Uint8Array, maxDepth: number): unknown;
+function decodeCBORToNativeValueNoLeftoverBytes(data: Uint8Array, maxDepth: number): unknown;
 ```
 
 ### Parameters
