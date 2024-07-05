@@ -2,9 +2,6 @@
 
 **Documentation: https://cbor.oslojs.dev**
 
-> [!CAUTION]
-> **This package is highly experimental!**
-
 A CBOR library for JavaScript based on [RFC 8949](https://datatracker.ietf.org/doc/html/rfc8949).
 
 - Runtime agnostic
