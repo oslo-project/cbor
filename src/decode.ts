@@ -431,13 +431,13 @@ function getVariableUint(data: Uint8Array, size: number, offset: number): bigint
 		return BigInt(data[offset]);
 	}
 	if (size === 2) {
-		return BigInt(bigEndian.uint16(data.subarray(offset, offset + size)));
+		return BigInt(bigEndian.uint16(data, offset));
 	}
 	if (size === 4) {
-		return BigInt(bigEndian.uint32(data.subarray(offset, offset + size)));
+		return BigInt(bigEndian.uint32(data, offset));
 	}
 	if (size === 8) {
-		return bigEndian.uint64(data.subarray(offset, offset + size));
+		return bigEndian.uint64(data, offset);
 	}
 	throw new TypeError("Invalid size");
 }
